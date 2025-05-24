@@ -8,7 +8,8 @@ using WorkerServicePipeline.Pipelines.Factories;
 using WorkerServicePipeline.Pipelines.Steps;
 using WorkerServicePipeline.Services;
 
-var builder = Host.CreateApplicationBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
+
 // Host Services Register
 builder.Services.AddHostedService<Worker1>();
 //builder.Services.AddHostedService<Worker2>();
@@ -35,6 +36,31 @@ builder.Services.AddHttpClient<IFakeApiClient, FakeApiClient>(client =>
 });
 // Logging Register
 builder.Services.AddLogging(configure => configure.AddConsole());
+// Healchech Register
+builder.Services.AddHealthChecks();
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenLocalhost(50001);
+});
 
 var host = builder.Build();
+
+host.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var result = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            status = report.Status.ToString(),
+            checks = report.Entries.Select(e => new {
+                name = e.Key,
+                status = e.Value.Status.ToString(),
+                description = e.Value.Description
+            })
+        });
+        await context.Response.WriteAsync(result);
+    }
+});
+
 host.Run();
