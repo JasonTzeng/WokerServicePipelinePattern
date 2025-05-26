@@ -15,7 +15,7 @@ namespace WorkerServicePipeline.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Worker2 started at: {time}", DateTimeOffset.Now);
+            _logger.LogInformation("Worker2 started at: {time}", DateTime.Now);
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -34,7 +34,7 @@ namespace WorkerServicePipeline.Services
                 await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
 
-            _logger.LogInformation("Worker2 stopping at: {time}", DateTimeOffset.Now);
+            _logger.LogInformation("Worker2 stopping at: {time}", DateTime.Now);
         }
     }
 }

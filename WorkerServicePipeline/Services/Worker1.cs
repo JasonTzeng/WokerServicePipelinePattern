@@ -17,7 +17,7 @@ namespace WorkerServicePipeline.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Worker1 started at: {time}", DateTimeOffset.Now);
+            _logger.LogInformation("Worker1 started at: {time}", DateTime.Now);
 
             // 讀取 Pipeline 名稱
             var pipelineName = _config["Workers:Worker1"];
@@ -58,7 +58,7 @@ namespace WorkerServicePipeline.Services
                 await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
 
-            _logger.LogInformation("Worker1 stopping at: {time}", DateTimeOffset.Now);
+            _logger.LogInformation("Worker1 stopping at: {time}", DateTime.Now);
         }
     }
 }

@@ -1,6 +1,12 @@
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging.Console;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using Prometheus;
 using WorkerServicePipeline.Abstractions;
 using WorkerServicePipeline.Apis.Clients;
 using WorkerServicePipeline.Apis.Interfaces;
+using WorkerServicePipeline.Logging;
 using WorkerServicePipeline.Messaging;
 using WorkerServicePipeline.Models;
 using WorkerServicePipeline.Pipelines;
@@ -28,24 +34,40 @@ builder.Services.AddScoped<CaseContext>();
 // Messaging Register
 builder.Services.AddSingleton<IEventPublisher, KafkaPublisher>();
 // HttpClient Register
-builder.Services.AddHttpClient();
-// ApiClient Register
 builder.Services.AddHttpClient<IFakeApiClient, FakeApiClient>(client =>
 {
     client.BaseAddress = new Uri("https://jsonplaceholder.typicode.com");
 });
 // Logging Register
-builder.Services.AddLogging(configure => configure.AddConsole());
-// Healchech Register
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole(options =>
+{
+    options.FormatterName = "customJson";
+});
+builder.Logging.AddConsoleFormatter<CustomJsonConsoleFormatter, ConsoleFormatterOptions>();
+
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing =>
+    {
+        tracing
+            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("WorkerServicePipeline"))
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddSource("WorkerServicePipeline")
+            .AddOtlpExporter();
+    });
+// Healcheck Register
 builder.Services.AddHealthChecks();
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenLocalhost(50001);
 });
 
-var host = builder.Build();
+var app = builder.Build();
 
-host.MapHealthChecks("/health", new HealthCheckOptions
+app.UseRouting();
+app.MapMetrics();
+app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = async (context, report) =>
     {
@@ -53,7 +75,8 @@ host.MapHealthChecks("/health", new HealthCheckOptions
         var result = System.Text.Json.JsonSerializer.Serialize(new
         {
             status = report.Status.ToString(),
-            checks = report.Entries.Select(e => new {
+            checks = report.Entries.Select(e => new
+            {
                 name = e.Key,
                 status = e.Value.Status.ToString(),
                 description = e.Value.Description
@@ -63,4 +86,4 @@ host.MapHealthChecks("/health", new HealthCheckOptions
     }
 });
 
-host.Run();
+app.Run();

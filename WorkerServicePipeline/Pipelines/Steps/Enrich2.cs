@@ -1,5 +1,6 @@
 ﻿using WorkerServicePipeline.Abstractions;
 using WorkerServicePipeline.Apis.Interfaces;
+using WorkerServicePipeline.Instrumentation;
 using WorkerServicePipeline.Models;
 
 namespace WorkerServicePipeline.Pipelines.Steps
@@ -20,6 +21,9 @@ namespace WorkerServicePipeline.Pipelines.Steps
         }
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            using var activity = Telemetry.ActivitySource.StartActivity("Enrich2Execution");
+            activity?.SetTag("step", "Enrich12");
+
             _logger.LogInformation("Enrich2 step started.");
 
             try

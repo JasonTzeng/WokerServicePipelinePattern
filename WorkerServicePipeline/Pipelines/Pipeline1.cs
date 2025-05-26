@@ -1,4 +1,5 @@
 ﻿using WorkerServicePipeline.Abstractions;
+using WorkerServicePipeline.Instrumentation;
 
 namespace WorkerServicePipeline.Pipelines
 {
@@ -39,6 +40,9 @@ namespace WorkerServicePipeline.Pipelines
 
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            using var activity = Telemetry.ActivitySource.StartActivity("PipelineExecution");
+            activity?.SetTag("pipeline", "pipeline1");
+
             foreach (var step in _steps)
             {
                 if (cancellationToken.IsCancellationRequested)

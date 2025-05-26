@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Json;
-using WorkerServicePipeline.Apis.Interfaces;
+﻿using WorkerServicePipeline.Apis.Interfaces;
 using WorkerServicePipeline.Models;
 
 namespace WorkerServicePipeline.Apis.Clients

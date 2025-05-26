@@ -1,4 +1,5 @@
 ﻿using WorkerServicePipeline.Abstractions;
+using WorkerServicePipeline.Instrumentation;
 using WorkerServicePipeline.Models;
 
 namespace WorkerServicePipeline.Pipelines.Steps
@@ -22,6 +23,9 @@ namespace WorkerServicePipeline.Pipelines.Steps
         }
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            using var activity = Telemetry.ActivitySource.StartActivity("SendToKafkaExecution");
+            activity?.SetTag("step", "SendToKafka");
+
             _logger.LogInformation("SendToKafka step started.");
 
             try
