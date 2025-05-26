@@ -54,7 +54,10 @@ builder.Services.AddOpenTelemetry()
             .AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
             .AddSource("WorkerServicePipeline")
-            .AddOtlpExporter();
+            .AddOtlpExporter(otlp =>
+            {
+                otlp.Endpoint = new Uri("http://localhost:4317");
+            });
     });
 // Healcheck Register
 builder.Services.AddHealthChecks();
@@ -66,7 +69,7 @@ builder.WebHost.ConfigureKestrel(options =>
 var app = builder.Build();
 
 app.UseRouting();
-app.MapMetrics();
+app.MapMetrics(); //Prometheus metrics endpoint
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = async (context, report) =>
