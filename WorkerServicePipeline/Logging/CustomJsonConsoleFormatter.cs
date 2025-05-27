@@ -2,13 +2,14 @@
 using Microsoft.Extensions.Logging.Console;
 using System.Diagnostics;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 
 namespace WorkerServicePipeline.Logging
 {
     public class CustomJsonConsoleFormatter : ConsoleFormatter, IDisposable
     {
-        private readonly JsonWriterOptions _jsonWriterOptions = new() { Indented = true };
+        private readonly JsonWriterOptions _jsonWriterOptions = new() { Indented = false, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
 
         public CustomJsonConsoleFormatter() : base("customJson") { }
 
