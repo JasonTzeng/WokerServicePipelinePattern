@@ -15,6 +15,7 @@ namespace WorkerServicePipeline.Pipelines.Steps
             _logger = logger;
             _context = context;
         }
+
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             using var activity = Telemetry.ActivitySource.StartActivity("Enrich3Execution");

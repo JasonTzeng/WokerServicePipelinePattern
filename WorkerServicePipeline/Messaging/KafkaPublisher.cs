@@ -15,7 +15,7 @@ namespace WorkerServicePipeline.Messaging
             _logger = logger;
             _config = config;
 
-            _bootstrapServers = _config["Kafka:BootstrapServers"];
+            _bootstrapServers = _config["Kafka:Publisher:BootstrapServers"];
             var kafkaConfig = new ProducerConfig
             {
                 BootstrapServers = _bootstrapServers

@@ -28,11 +28,13 @@ builder.Services.AddSingleton<IStepFactory, SetupFactory>();
 builder.Services.AddScoped<Enrich1>();
 builder.Services.AddScoped<Enrich2>();
 builder.Services.AddScoped<Enrich3>();
-builder.Services.AddScoped<SendToKafka>();
+builder.Services.AddScoped<ConsumeFromKafka>();
+builder.Services.AddScoped<PublishToKafka>();
 // Model Register
 builder.Services.AddScoped<CaseContext>();
 // Messaging Register
 builder.Services.AddSingleton<IEventPublisher, KafkaPublisher>();
+builder.Services.AddSingleton<IEventConsumer, KafkaConsumer>();
 // HttpClient Register
 builder.Services.AddHttpClient<IFakeApiClient, FakeApiClient>(client =>
 {
