@@ -4,14 +4,12 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Prometheus;
 using WorkerServicePipeline.Abstractions;
-using WorkerServicePipeline.Apis.Clients;
-using WorkerServicePipeline.Apis.Interfaces;
+using WorkerServicePipeline.Helpers;
 using WorkerServicePipeline.Logging;
 using WorkerServicePipeline.Messaging;
 using WorkerServicePipeline.Models;
 using WorkerServicePipeline.Pipelines;
 using WorkerServicePipeline.Pipelines.Factories;
-using WorkerServicePipeline.Pipelines.Steps;
 using WorkerServicePipeline.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,13 +23,7 @@ builder.Services.AddScoped<Pipeline2>();
 // Factory Register
 builder.Services.AddSingleton<IStepFactory, SetupFactory>();
 // Step Register
-builder.Services.AddScoped<Enrich1>();
-builder.Services.AddScoped<Enrich2>();
-builder.Services.AddScoped<Enrich3>();
-builder.Services.AddScoped<ConsumeFromKafka>();
-builder.Services.AddScoped<PublishToKafka>();
-builder.Services.AddScoped<ConsumeFromSolace>();
-builder.Services.AddScoped<PublishToSolace>();
+ServiceRegistrationHelpers.RegisterAllSteps(builder.Services);
 // Model Register
 builder.Services.AddScoped<CaseContext>();
 // Messaging Register
@@ -40,10 +32,7 @@ builder.Services.AddKeyedSingleton<IEventConsumer, SolaceConsumer>("solace");
 builder.Services.AddKeyedSingleton<IEventPublisher, KafkaPublisher>("kafka");
 builder.Services.AddKeyedSingleton<IEventPublisher, SolacePublisher>("solace");
 // HttpClient Register
-builder.Services.AddHttpClient<IFakeApiClient, FakeApiClient>(client =>
-{
-    client.BaseAddress = new Uri("https://jsonplaceholder.typicode.com");
-});
+ServiceRegistrationHelpers.RegisterHttpClients(builder.Services);
 // Logging Register
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole(options =>
@@ -51,7 +40,7 @@ builder.Logging.AddConsole(options =>
     options.FormatterName = "customJson";
 });
 builder.Logging.AddConsoleFormatter<CustomJsonConsoleFormatter, ConsoleFormatterOptions>();
-
+// OpenTelemetry Register
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracing =>
     {
@@ -74,6 +63,7 @@ builder.WebHost.ConfigureKestrel(options =>
 
 var app = builder.Build();
 
+// Middleware & Endpoint Register
 app.UseRouting();
 app.MapMetrics(); //Prometheus metrics endpoint
 app.MapHealthChecks("/health", new HealthCheckOptions

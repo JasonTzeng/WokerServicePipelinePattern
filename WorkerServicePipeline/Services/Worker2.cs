@@ -1,5 +1,4 @@
-﻿using Confluent.Kafka;
-using WorkerServicePipeline.Abstractions;
+﻿using WorkerServicePipeline.Abstractions;
 
 namespace WorkerServicePipeline.Services
 {
