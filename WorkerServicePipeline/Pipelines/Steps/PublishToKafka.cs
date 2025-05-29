@@ -13,7 +13,7 @@ namespace WorkerServicePipeline.Pipelines.Steps
         private readonly CaseContext _context;
 
         public PublishToKafka(ILogger<PublishToKafka> logger,
-            IEventPublisher kafkaPublisher,
+            [FromKeyedServices("kafka")] IEventPublisher kafkaPublisher,
             IConfiguration config,
             CaseContext context)
         {

@@ -1,0 +1,27 @@
+﻿version: '3.3'
+
+services:
+  solace-broker:
+    image: solace/solace-pubsub-standard:latest
+    container_name: solace-broker
+    ports:
+      - "8082:8080"   # SEMP / PubSub+ Manager
+      - "55555:55555" # SMF
+      - "8008:8008"   # Web transport
+      - "1883:1883"   # MQTT Default VPN
+      - "5672:5672"   # AMQP Default VPN
+      - "9001:9000"   # REST Default VPN
+    environment:
+      - username_admin_globalaccesslevel=admin
+      - username_admin_password=admin
+      - system_scaling_maxconnectioncount=100
+    volumes:
+      - solace-storage:/var/lib/solace
+    shm_size: '1g'
+    ulimits:
+      nofile:
+        soft: 2448
+        hard: 6592
+
+volumes:
+  solace-storage:

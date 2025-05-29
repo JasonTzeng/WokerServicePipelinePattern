@@ -18,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Host Services Register
 builder.Services.AddHostedService<Worker1>();
-//builder.Services.AddHostedService<Worker2>();
+builder.Services.AddHostedService<Worker2>();
 // Pipeline Register
 builder.Services.AddScoped<Pipeline1>();
 builder.Services.AddScoped<Pipeline2>();
@@ -30,11 +30,15 @@ builder.Services.AddScoped<Enrich2>();
 builder.Services.AddScoped<Enrich3>();
 builder.Services.AddScoped<ConsumeFromKafka>();
 builder.Services.AddScoped<PublishToKafka>();
+builder.Services.AddScoped<ConsumeFromSolace>();
+builder.Services.AddScoped<PublishToSolace>();
 // Model Register
 builder.Services.AddScoped<CaseContext>();
 // Messaging Register
-builder.Services.AddSingleton<IEventPublisher, KafkaPublisher>();
-builder.Services.AddSingleton<IEventConsumer, KafkaConsumer>();
+builder.Services.AddKeyedSingleton<IEventConsumer, KafkaConsumer>("kafka");
+builder.Services.AddKeyedSingleton<IEventConsumer, SolaceConsumer>("solace");
+builder.Services.AddKeyedSingleton<IEventPublisher, KafkaPublisher>("kafka");
+builder.Services.AddKeyedSingleton<IEventPublisher, SolacePublisher>("solace");
 // HttpClient Register
 builder.Services.AddHttpClient<IFakeApiClient, FakeApiClient>(client =>
 {

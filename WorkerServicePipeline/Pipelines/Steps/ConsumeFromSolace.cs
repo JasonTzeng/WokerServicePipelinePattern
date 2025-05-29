@@ -5,41 +5,43 @@ using WorkerServicePipeline.Models;
 
 namespace WorkerServicePipeline.Pipelines.Steps
 {
-    public class ConsumeFromKafka : IStep
+    public class ConsumeFromSolace : IStep
     {
-        private readonly ILogger<ConsumeFromKafka> _logger;
-        private readonly IEventConsumer _kafkaConsumer;
+        private readonly ILogger<ConsumeFromSolace> _logger;
+        private readonly IEventConsumer _solaceConsumer;
         private readonly IConfiguration _config;
         private readonly CaseContext _context;
 
-        public ConsumeFromKafka(ILogger<ConsumeFromKafka> logger,
-            [FromKeyedServices("kafka")] IEventConsumer kafkaConsumer,
+        public ConsumeFromSolace(ILogger<ConsumeFromSolace> logger,
+            [FromKeyedServices("solace")] IEventConsumer SolaceConsumer,
             IConfiguration config,
             CaseContext context)
         {
             _logger = logger;
-            _kafkaConsumer = kafkaConsumer;
+            _solaceConsumer = SolaceConsumer;
             _config = config;
             _context = context;
         }
 
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            using var activity = Telemetry.ActivitySource.StartActivity("ConsumeFromKafkaExecution");
-            activity?.SetTag("step", "ConsumeFromKafka");
+            using var activity = Telemetry.ActivitySource.StartActivity("ConsumeFromSolaceExecution");
+            activity?.SetTag("step", "ConsumeFromSolace");
 
-            _logger.LogInformation("ConsumeFromKafka step started.");
+            _logger.LogInformation("ConsumeFromSolace step started.");
 
             try
             {
-                string topic = _config["Kafka:Consumer:Topic"] ?? "";
+                //string topic = _config["Solace:Consumer:Topic"] ?? "";
+                string topic = _config["Solace:Consumer:Queue"] ?? "";
+
                 if (string.IsNullOrWhiteSpace(topic))
                 {
-                    _logger.LogWarning("Kafka topic is not configured.");
+                    _logger.LogWarning("solace topic is not configured.");
                     return;
                 }
 
-                await _kafkaConsumer.ConsumeAsync(topic, async message =>
+                await _solaceConsumer.ConsumeAsync(topic, async message =>
                 {
                     try
                     {
@@ -64,11 +66,11 @@ namespace WorkerServicePipeline.Pipelines.Steps
                     await Task.CompletedTask;
                 }, cancellationToken);
 
-                _logger.LogInformation("ConsumeFromKafka step completed successfully.");
+                _logger.LogInformation("ConsumeFromSolace step completed successfully.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "ConsumeFromKafka step encountered an error.");
+                _logger.LogError(ex, "ConsumeFromSolace step encountered an error.");
             }
         }
 
