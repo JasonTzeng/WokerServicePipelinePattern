@@ -48,7 +48,7 @@ namespace WorkerServicePipeline.Pipelines.Steps
                         var context = JsonSerializer.Deserialize<CaseContext>(message);
                         if (context != null)
                         {
-                            // 將反序列化後的內容複製到現有 _context
+                            // Copy the deserialized content to the existing _context
                             _context.RawJson = context.RawJson;
                             _context.EnrichedData = context.EnrichedData ?? new Dictionary<string, object>();
                             _logger.LogInformation("Deserialized message into CaseContext: RawJson={RawJson}, EnrichedDataCount={EnrichedDataCount}", _context.RawJson, _context.EnrichedData.Count);

@@ -60,23 +60,24 @@ All pipelines, steps, factories, API clients, and message consumers are register
 ## Folder Structure
 
 WorkerServicePipeline/
-├── Abstractions/         # 定義核心介面，如 IPipeline、IStep、IStepFactory
-├── Apis/                 # API 客戶端與介面
-│   ├── Interfaces/       # API 介面定義
-│   └── Clients/          # API 實作
-├── Helpers/              # 共用註冊與輔助類別
-├── Instrumentation/      # 監控與追蹤相關程式
-├── Logging/              # 日誌格式化與相關設定
-├── Messaging/         # 訊息佇列（如 Kafka、Solace）相關元件
-├── Models/               # 資料模型（如 CaseContext）
-├── Pipelines/            # Pipeline 與步驟實作
-│   ├── Steps/            # 各種步驟（Step）實作
-│   └── Factories/        # 步驟工廠
-├── Services/             # Worker 服務本體
-├── appsettings.json      # 設定檔
-├── Program.cs            # 進入點與 DI 註冊
-├── WorkerServicePipeline.csproj # 專案檔
-└── README.md             # 專案說明文件
+├── Abstractions/         # Defines core interfaces, such as IPipeline, IStep, IStepFactory
+├── Apis/                 # API clients and interfaces
+│   ├── Interfaces/       # API interface definitions
+│   └── Clients/          # API implementations
+├── Helpers/              # Shared registration and helper classes
+├── Instrumentation/      # Monitoring and tracing related code
+├── Logging/              # Log formatting and related settings
+├── Messaging/            # Messaging components (e.g., Kafka, Solace)
+├── Models/               # Data models (e.g., CaseContext)
+├── Pipelines/            # Pipeline and step implementations
+│   ├── Steps/            # Step implementations
+│   └── Factories/        # Step factories
+├── Services/             # Worker service implementations
+├── Docker/               # Dockerfiles and containerization resources
+├── appsettings.json      # Configuration file
+├── Program.cs            # Entry point and DI registration
+├── WorkerServicePipeline.csproj # Project file
+└── README.md             # Project documentation
 
 ---
 

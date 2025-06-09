@@ -39,7 +39,7 @@ namespace WorkerServicePipeline.Messaging
         {
             var tcs = new TaskCompletionSource();
 
-            // 根據命名規則判斷是 queue 還是 topic
+            // Determine if it is a queue or topic based on the naming convention
             if (destinationName.EndsWith("/QUEUE", StringComparison.OrdinalIgnoreCase))
             {
                 // Queue (Flow-based)
@@ -53,7 +53,7 @@ namespace WorkerServicePipeline.Messaging
                 _flow = _session.CreateFlow(
                     flowProps,
                     _queue,
-                    null, // 若不需額外 subscription，可設為 null
+                    null, // Set to null if no additional subscription is needed
                     async (sender, args) =>
                     {
                         var text = System.Text.Encoding.UTF8.GetString(args.Message.BinaryAttachment);
@@ -61,9 +61,9 @@ namespace WorkerServicePipeline.Messaging
                         await onMessage(text);
 
                         // Fix: Use the IMessage extension method to acknowledge the message
-                        _flow?.Ack(args.Message.ADMessageId); // 確認訊息已被處理
-                        _flow?.Dispose(); // 只收一筆就停止
-                        tcs.TrySetResult(); // 收到訊息後完成 Task
+                        _flow?.Ack(args.Message.ADMessageId); // Confirm the message has been processed
+                        _flow?.Dispose(); // Stop after receiving a single message
+                        tcs.TrySetResult(); // Complete the Task after receiving the message
                     },
                     // Update the error logging callback for the queue flow to correctly handle FlowEventArgs
                     (sender, args) => _logger.LogError("Solace queue flow error: {Error}", args.Info)
@@ -80,7 +80,7 @@ namespace WorkerServicePipeline.Messaging
                     var text = System.Text.Encoding.UTF8.GetString(args.Message.BinaryAttachment);
                     _logger.LogInformation("Received message from Solace topic {Topic}", destinationName);
                     await onMessage(text);
-                    tcs.TrySetResult(); // 收到訊息後完成 Task
+                    tcs.TrySetResult(); // Complete the Task after receiving the message
                 };
 
                 // Fix: Use the IDispatchTarget interface to subscribe to the topic
